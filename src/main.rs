@@ -12,9 +12,7 @@ use tower_http::services::ServeDir;
 
 #[tokio::main]
 async fn main() {
-    let routes_hello = Router::new()
-        .route("/hello", get(handler_hello))
-        .route("/hello2/:name", get(handler_hello2))
+    let routes_hello = Router::new().merge(routes_hello())
         .fallback_service(routes_static());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
@@ -22,6 +20,12 @@ async fn main() {
 
     let listener = TcpListener::bind(&addr).await.unwrap();
     axum::serve(listener, routes_hello).await.unwrap();
+}
+
+fn routes_hello() -> Router {
+    Router::new()
+        .route("/hello", get(handler_hello))
+        .route("/hello2/:name", get(handler_hello2))
 }
 
 // 静态文件路由
