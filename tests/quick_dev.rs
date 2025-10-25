@@ -1,5 +1,5 @@
 use anyhow::Result;
-
+use serde_json::json;
 #[tokio::test]
 async fn quick_dev() -> Result<()> {
     println!("->> TEST QUICK DEV");
@@ -7,5 +7,14 @@ async fn quick_dev() -> Result<()> {
     hc.do_get("/hello?name=John").await?.print().await?;
     hc.do_get("/hello2/Mi").await?.print().await?;
     hc.do_get("/src/main.rs").await?.print().await?;
+    let req_login = hc.do_post(
+        "/api/login",
+        json!({
+            "username": "admin",
+            "pwd": "admin"
+        }),
+    );
+    req_login.await?.print().await?;
+
     Ok(())
 }

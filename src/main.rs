@@ -1,5 +1,7 @@
 use std::net::SocketAddr;
 
+pub use self::error::{Error, Result};
+
 use axum::{
     Router,
     extract::{Path, Query},
@@ -10,9 +12,14 @@ use serde::Deserialize;
 use tokio::net::TcpListener;
 use tower_http::services::ServeDir;
 
+mod error;
+mod web;
+
 #[tokio::main]
 async fn main() {
-    let routes_hello = Router::new().merge(routes_hello())
+    let routes_hello = Router::new()
+        .merge(routes_hello())
+        .merge(web::routes_login::routes())
         .fallback_service(routes_static());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
