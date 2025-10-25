@@ -5,11 +5,13 @@ pub use self::error::{Error, Result};
 use axum::{
     Router,
     extract::{Path, Query},
-    response::{Html, IntoResponse},
+    middleware,
+    response::{Html, IntoResponse, Response},
     routing::{get, get_service},
 };
 use serde::Deserialize;
 use tokio::net::TcpListener;
+use tower_cookies::CookieManagerLayer;
 use tower_http::services::ServeDir;
 
 mod error;
@@ -20,6 +22,8 @@ async fn main() {
     let routes_hello = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
+        .layer(middleware::map_response(main_response_mapper))
+        .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
@@ -32,12 +36,18 @@ async fn main() {
 fn routes_hello() -> Router {
     Router::new()
         .route("/hello", get(handler_hello))
-        .route("/hello2/:name", get(handler_hello2))
+        .route("/hello2/{name}", get(handler_hello2))
 }
 
 // 静态文件路由
 fn routes_static() -> Router {
-    Router::new().nest_service("/", get_service(ServeDir::new("./")))
+    Router::new().fallback_service(get_service(ServeDir::new("./")))
+}
+
+async fn main_response_mapper(res: Response) -> Response {
+    println!("->> {:<12} - main_response_mapper", "RES_MAPPER");
+    println!();
+    res
 }
 
 #[derive(Debug, Deserialize)]
