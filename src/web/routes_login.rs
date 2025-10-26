@@ -34,7 +34,6 @@ async fn api_login(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json
         "access_token": "token-xxx",
         "token_type": "Bearer"
         }
-
     }));
     Ok(body)
 }

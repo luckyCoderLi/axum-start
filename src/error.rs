@@ -7,6 +7,7 @@ pub type Result<T> = core::result::Result<T, Error>;
 pub enum Error {
     LoginFail,
     TicketDeleteFailIdNotFound { id: i64 },
+    AuthFailNoAuthTokenCookie,
 }
 
 impl IntoResponse for Error {
@@ -17,6 +18,11 @@ impl IntoResponse for Error {
             Error::TicketDeleteFailIdNotFound { id } => (
                 StatusCode::NOT_FOUND,
                 format!("Ticket delete failed, id not found: {}", id),
+            )
+                .into_response(),
+            Error::AuthFailNoAuthTokenCookie => (
+                StatusCode::UNAUTHORIZED,
+                "Authentication failed, no auth token cookie",
             )
                 .into_response(),
         }
