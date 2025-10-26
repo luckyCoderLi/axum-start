@@ -16,5 +16,19 @@ async fn quick_dev() -> Result<()> {
     hc.do_get("/hello2/Mi").await?.print().await?;
     // hc.do_get("/src/main.rs").await?.print().await?;
 
+    hc.do_get("/api/tickets/list").await?.print().await?;
+    hc.do_post(
+        "/api/tickets/create",
+        json!({
+            "title": "test ticket"
+        }),
+    )
+    .await?
+    .print()
+    .await?;
+    hc.do_get("/api/tickets/list").await?.print().await?;
+    hc.do_delete("/api/tickets/delete/0").await?.print().await?;
+    hc.do_get("/api/tickets/list").await?.print().await?;
+
     Ok(())
 }
