@@ -8,6 +8,7 @@ pub enum Error {
     LoginFail,
     TicketDeleteFailIdNotFound { id: i64 },
     AuthFailNoAuthTokenCookie,
+    ServerError(String),
 }
 
 impl IntoResponse for Error {
@@ -25,6 +26,23 @@ impl IntoResponse for Error {
                 "Authentication failed, no auth token cookie",
             )
                 .into_response(),
+            Error::ServerError(msg) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                msg,
+            )
+                .into_response(),
         }
+    }
+}
+
+impl From<String> for Error {
+    fn from(msg: String) -> Self {
+        Error::ServerError(msg)
+    }
+}
+
+impl From<&str> for Error {
+    fn from(msg: &str) -> Self {
+        Error::ServerError(msg.to_string())
     }
 }

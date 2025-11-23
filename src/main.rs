@@ -39,8 +39,10 @@ async fn main() -> Result<()> {
     let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
     println!("->> listening on {addr}\n");
 
-    let listener = TcpListener::bind(&addr).await.unwrap();
-    axum::serve(listener, routes_hello).await.unwrap();
+    let listener = TcpListener::bind(&addr).await
+        .map_err(|e| Error::ServerError(format!("无法绑定地址 {}: {}. 请检查端口是否被占用", addr, e)))?;
+    axum::serve(listener, routes_hello).await
+        .map_err(|e| Error::ServerError(format!("服务器启动失败: {}", e)))?;
     Ok(())
 }
 
